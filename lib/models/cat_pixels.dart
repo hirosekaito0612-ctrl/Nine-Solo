@@ -9,7 +9,7 @@
 ///   b=ほっぺ  m=けむり  g=きらきら  y=タバコ(黄)  t=なみだ
 library;
 
-enum Mood { great, good, worried, bad }
+enum Mood { great, good, worried, bad, calm }
 
 class CatArt {
   const CatArt._();
@@ -63,6 +63,12 @@ class CatArt {
         g[9] = 'kwwwwwkyykwwwwwk';
         g[10] = 'kwbwwkwwwwkwwbwk';
         break;
+      case Mood.calm: // 深呼吸中 目を閉じておだやか
+        g[6] = 'kwwwwwwwwwwwwwwk';
+        g[7] = 'kwweewwwwwweewwk';
+        g[9] = 'kwbwwwkwwkwwwbwk';
+        g[10] = 'kwbwwwwkkwwwwbwk';
+        break;
     }
     return g;
   }
@@ -78,6 +84,8 @@ class CatArt {
         return 'んー、ちょっと多いかも。深呼吸しよ？';
       case Mood.bad:
         return 'ゴホッ…むりしないで休もうにゃ。また一緒にがんばろ？';
+      case Mood.calm:
+        return 'すーっ…はーっ…いっしょに深呼吸するにゃ…';
     }
   }
 
@@ -92,6 +100,8 @@ class CatArt {
         return 'ちょっと注意';
       case Mood.bad:
         return 'ひとやすみ';
+      case Mood.calm:
+        return 'しんこきゅう';
     }
   }
 }

@@ -5,6 +5,9 @@ import '../models/quit_data.dart';
 import '../widgets/pixel_cat.dart';
 import '../widgets/speech_bubble.dart';
 import '../widgets/stat_tile.dart';
+import 'achievements_screen.dart';
+import 'breathing_screen.dart';
+import 'history_screen.dart';
 
 /// メイン画面。ヤメにゃんと今日の本数、統計を表示する。
 class HomeScreen extends StatefulWidget {
@@ -48,6 +51,8 @@ class _HomeScreenState extends State<HomeScreen>
         return const Color(0xFFE0A72E);
       case Mood.bad:
         return const Color(0xFFD9695A);
+      case Mood.calm:
+        return const Color(0xFF4C8DD6);
     }
   }
 
@@ -59,6 +64,40 @@ class _HomeScreenState extends State<HomeScreen>
   Future<void> _undo() async {
     await data.removeCigarette();
     if (mounted) setState(() {});
+  }
+
+  /// 吸いたくなったとき用の深呼吸モードを開く。
+  /// がまんできたら記録して、ヤメにゃんからひとこと。
+  Future<void> _openBreathing() async {
+    final bool? resisted = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute<bool>(
+          builder: (BuildContext _) => const BreathingScreen()),
+    );
+    if (resisted == true) {
+      await data.addResisted();
+      if (!mounted) return;
+      setState(() {});
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('がまんできてえらいにゃ！🐾')),
+      );
+    }
+  }
+
+  void _openHistory() {
+    Navigator.push<void>(
+      context,
+      MaterialPageRoute<void>(
+          builder: (BuildContext _) => HistoryScreen(data: data)),
+    );
+  }
+
+  void _openAchievements() {
+    Navigator.push<void>(
+      context,
+      MaterialPageRoute<void>(
+          builder: (BuildContext _) => AchievementsScreen(data: data)),
+    );
   }
 
   @override
@@ -76,6 +115,16 @@ class _HomeScreenState extends State<HomeScreen>
             style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.transparent,
         actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.bar_chart_rounded),
+            tooltip: 'きろく',
+            onPressed: _openHistory,
+          ),
+          IconButton(
+            icon: const Icon(Icons.emoji_events_outlined),
+            tooltip: 'じっせき',
+            onPressed: _openAchievements,
+          ),
           IconButton(
             icon: const Icon(Icons.settings_outlined),
             tooltip: '設定',
@@ -206,6 +255,17 @@ class _HomeScreenState extends State<HomeScreen>
                   ],
                 ),
               ),
+              const SizedBox(height: 12),
+
+              // 吸いたくなったときのSOSボタン
+              FilledButton.tonalIcon(
+                onPressed: _openBreathing,
+                icon: const Icon(Icons.air),
+                label: const Text('吸いたくなった… 深呼吸する'),
+                style: FilledButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+              ),
               const SizedBox(height: 20),
 
               // 統計
@@ -233,13 +293,28 @@ class _HomeScreenState extends State<HomeScreen>
                 ],
               ),
               const SizedBox(height: 12),
-              StatTile(
-                icon: Icons.savings_outlined,
-                label: '節約できた金額',
-                value: '¥${data.moneySaved.round()}',
-                unit: '',
-                color: const Color(0xFF4C8DD6),
-                wide: true,
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: StatTile(
+                      icon: Icons.favorite_outline,
+                      label: 'がまんできた回数',
+                      value: '${data.totalResisted}',
+                      unit: '回',
+                      color: const Color(0xFF8E6FD8),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: StatTile(
+                      icon: Icons.savings_outlined,
+                      label: '節約できた金額',
+                      value: '¥${data.moneySaved.round()}',
+                      unit: '',
+                      color: const Color(0xFF4C8DD6),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 12),
               Center(

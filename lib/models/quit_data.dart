@@ -15,6 +15,7 @@ class QuitData {
   int cigsPerPack; // 1箱の本数
   String startDate; // 記録開始日 yyyy-MM-dd
   Map<String, int> counts; // 日付 -> 本数
+  Map<String, int> resisted; // 日付 -> 我慢できた回数
 
   QuitData({
     required this.onboarded,
@@ -23,6 +24,7 @@ class QuitData {
     required this.cigsPerPack,
     required this.startDate,
     required this.counts,
+    required this.resisted,
   });
 
   // ---- 日付ヘルパー -------------------------------------------------------
@@ -82,6 +84,29 @@ class QuitData {
 
   double get moneySaved => cigarettesAvoided * pricePerCig;
 
+  int get todayResisted => resisted[today()] ?? 0;
+
+  /// 「吸いたいのを我慢できた」回数の累計。
+  int get totalResisted =>
+      resisted.values.fold(0, (int sum, int v) => sum + v);
+
+  /// 直近 [days] 日分の記録を古い順に返す（今日を含む）。
+  List<DayRecord> recentDays(int days) {
+    final List<DayRecord> result = <DayRecord>[];
+    final DateTime now = DateTime.now();
+    for (int i = days - 1; i >= 0; i--) {
+      final DateTime d = DateTime(now.year, now.month, now.day - i);
+      final String key = fmt(d);
+      result.add(DayRecord(
+        date: d,
+        count: counts[key] ?? 0,
+        resisted: resisted[key] ?? 0,
+        beforeStart: key.compareTo(startDate) < 0,
+      ));
+    }
+    return result;
+  }
+
   int get daysSinceStart {
     final DateTime? start = DateTime.tryParse(startDate);
     if (start == null) return 1;
@@ -102,6 +127,12 @@ class QuitData {
     final String k = today();
     final int v = (counts[k] ?? 0) - 1;
     counts[k] = v < 0 ? 0 : v;
+    await save();
+  }
+
+  Future<void> addResisted() async {
+    final String k = today();
+    resisted[k] = (resisted[k] ?? 0) + 1;
     await save();
   }
 
@@ -127,6 +158,7 @@ class QuitData {
       cigsPerPack: p.getInt('cigs_per_pack') ?? 20,
       startDate: p.getString('start_date') ?? today(),
       counts: _decode(p.getString('counts')),
+      resisted: _decode(p.getString('resisted')),
     );
   }
 
@@ -138,6 +170,7 @@ class QuitData {
     await p.setInt('cigs_per_pack', cigsPerPack);
     await p.setString('start_date', startDate);
     await p.setString('counts', jsonEncode(counts));
+    await p.setString('resisted', jsonEncode(resisted));
   }
 
   Future<void> resetAll() async {
@@ -149,6 +182,7 @@ class QuitData {
     cigsPerPack = 20;
     startDate = today();
     counts = <String, int>{};
+    resisted = <String, int>{};
   }
 
   static Map<String, int> _decode(String? s) {
@@ -156,4 +190,19 @@ class QuitData {
     final Map<String, dynamic> m = jsonDecode(s) as Map<String, dynamic>;
     return m.map((String k, dynamic v) => MapEntry(k, (v as num).toInt()));
   }
+}
+
+/// 履歴表示用の1日分の記録。
+class DayRecord {
+  const DayRecord({
+    required this.date,
+    required this.count,
+    required this.resisted,
+    required this.beforeStart,
+  });
+
+  final DateTime date;
+  final int count; // 吸った本数
+  final int resisted; // 我慢できた回数
+  final bool beforeStart; // 記録開始日より前かどうか
 }

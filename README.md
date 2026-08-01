@@ -15,6 +15,9 @@ Flutter 製なので iPhone / Android の両方で動きます。
   | ちょっと注意 | 〜75% | あせあせ💦 |
   | ひとやすみ | 76%〜 | なみだ＋けむり |
 - 🔥 **連続ゼロ本日数** / 🫧 **我慢した本数** / 💰 **節約できた金額** を自動集計
+- 🌬️ **深呼吸モード**: 吸いたくなったら「深呼吸する」ボタン。ヤメにゃんと一緒に4秒吸って4秒吐く×4回。がまんできたら回数を記録
+- 📈 **きろく画面**: 直近14日間の本数を色分け棒グラフ＋日別リストで振り返り
+- 🏅 **じっせき画面**: 連続ゼロ本・がまん回数・節約金額などで10種のバッジをアンロック
 - 💾 データは端末内（SharedPreferences）に保存
 
 ## キャラクターについて
@@ -64,9 +67,13 @@ lib/
   models/
     cat_pixels.dart             ヤメにゃんのドット絵＆セリフ
     quit_data.dart             データ保存・集計・気分判定ロジック
+    achievements.dart          実績（バッジ）の定義と判定
   screens/
     onboarding_screen.dart     初回設定
     home_screen.dart           メイン画面
+    breathing_screen.dart      深呼吸モード（吸いたくなったとき用）
+    history_screen.dart        直近14日間のグラフと日別リスト
+    achievements_screen.dart   実績バッジ一覧
   widgets/
     pixel_cat.dart             ドット絵描画
     speech_bubble.dart         ふきだし
