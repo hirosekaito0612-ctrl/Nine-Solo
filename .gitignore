@@ -1,0 +1,22 @@
+# Flutter / Dart
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+pubspec.lock
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.log
+
+# OS
+.DS_Store
+
+# Generated native (再生成可能: `flutter create .` で作成)
+# 下記のプラットフォームフォルダはコミットしていません。
+# 初回のみ `flutter create .` を実行して生成してください。
