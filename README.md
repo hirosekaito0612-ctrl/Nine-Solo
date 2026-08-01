@@ -1,6 +1,6 @@
 # ヤメにゃん 🐾🚭
 
-ドット絵ネコの相棒「**ヤメにゃん**」と一緒にがんばる、**禁煙サポートアプリ**です。
+猫耳の女の子「**ヤメにゃん**」と一緒にがんばる、**禁煙サポートアプリ**です。
 Flutter 製なので iPhone / Android の両方で動きます。
 
 ## できること
@@ -19,34 +19,29 @@ Flutter 製なので iPhone / Android の両方で動きます。
 
 ## キャラクターについて
 
-ヤメにゃんは、このアプリのために描き下ろした**完全オリジナルのドット絵キャラクター**です。
-画像ファイルは使わず、`lib/models/cat_pixels.dart` の 16×16 の文字グリッドを
+ヤメにゃんは、このアプリのために作った**完全オリジナルの猫耳キャラクター**です
+（金髪・気だるげな目・オーバーサイズの服・猫耳＆しっぽのローファイなアニメ調ドット絵）。
+画像ファイルは一切使わず、`lib/models/cat_pixels.dart` の **64×80** の文字グリッドを
 `CustomPainter`（`lib/widgets/pixel_cat.dart`）でリアルタイムに描画しています。
 そのため外部アセットが不要で、どの解像度でもドットがくっきり表示されます。
+ドットデータは `tool/gen_char.py` で手続き的に生成して焼き込んだもので、
 既存キャラクターの画像・データは一切使用していません。
 
 ## 動かし方
 
-このリポジトリには Flutter の **ソースコード（`lib/`・`test/`・`pubspec.yaml`）** が入っています。
-ネイティブのプラットフォームフォルダ（`android/` `ios/` など）は含めていないので、
-初回だけ以下を実行して生成してください。
+`android/` `ios/` `web/` のプラットフォームフォルダも含まれているので、そのまま動きます。
 
 ```bash
 # 1. Flutter SDK を用意（https://docs.flutter.dev/get-started/install）
 flutter --version
 
-# 2. リポジトリのルートでプラットフォームフォルダを生成
-flutter create --project-name nine_solo --org com.example .
-
-# 3. 依存関係を取得
+# 2. 依存関係を取得
 flutter pub get
 
-# 4. 実機 / シミュレータで実行
-flutter run
+# 3. 実機 / シミュレータ / ブラウザで実行
+flutter run              # 接続中の端末で
+flutter run -d chrome    # ブラウザで確認する場合
 ```
-
-> `flutter create .` は `lib/main.dart` を上書きすることがあります。
-> その場合は `git checkout lib/main.dart` で元に戻してください（本リポジトリの実装が正です）。
 
 ### テスト
 
@@ -54,7 +49,15 @@ flutter run
 flutter test
 ```
 
-ドット絵が全気分で 16×16 になっているか、気分判定・集計ロジックが正しいかを検証します。
+ドット絵が全気分で 64×80 になっているか、気分判定・集計ロジックが正しいかを検証します。
+
+## キャラクターのドット絵を編集するには
+
+`tool/gen_char.py` を編集して再生成します（実行時は Dart の文字列のみで Python は不要）。
+
+```bash
+python3 tool/gen_char.py   # lib/models/cat_pixels.dart を上書き生成
+```
 
 ## 構成
 

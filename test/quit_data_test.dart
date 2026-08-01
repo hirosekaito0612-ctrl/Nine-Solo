@@ -13,12 +13,12 @@ QuitData _sample() => QuitData(
 
 void main() {
   group('CatArt', () {
-    test('全ての気分でドット絵は16x16である', () {
+    test('全ての気分でドット絵は64x80である', () {
       for (final Mood m in Mood.values) {
         final List<String> g = CatArt.forMood(m);
-        expect(g.length, 16, reason: '$m の行数');
+        expect(g.length, 80, reason: '$m の行数');
         for (final String row in g) {
-          expect(row.length, 16, reason: '$m の行 "$row"');
+          expect(row.length, 64, reason: '$m の行 "$row"');
         }
       }
     });

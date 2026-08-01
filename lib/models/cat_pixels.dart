@@ -1,12 +1,7 @@
-/// ヤメにゃんのドット絵データ。
+/// 猫耳の女の子「ヤメにゃん」の高解像度ドット絵データ。
 ///
-/// 画像ファイルは一切使わず、16x16 のドット（文字グリッド）をコードで描画する。
-/// これにより外部アセット不要でどの端末でもクリアに表示でき、
-/// 既存キャラクターの著作物にも一切依存しないオリジナルの相棒ネコになる。
-///
-/// 各文字は [palette] の色に対応する（'.' は透明）:
-///   k=輪郭  w=体(クリーム)  p=耳/鼻ピンク  e=目  h=ハイライト
-///   b=ほっぺ  m=けむり  g=きらきら  y=タバコ(黄)  t=なみだ
+/// 画像ファイルは使わず、64x80 の文字グリッドをコードで描画する。
+/// grids は tool（Python）で手続き生成して焼き込んだもの。
 library;
 
 enum Mood { great, good, worried, bad }
@@ -14,64 +9,343 @@ enum Mood { great, good, worried, bad }
 class CatArt {
   const CatArt._();
 
-  /// ベースとなる素体（ふつうの顔）。全16行×16文字。
-  static const List<String> _base = <String>[
-    '...k........k...', // 0  耳の先
-    '..kwk......kwk..', // 1
-    '.kwpwk....kwpwk.', // 2  耳（内側ピンク）
-    '.kwwwwwwwwwwwwk.', // 3  頭
-    'kwwwwwwwwwwwwwwk', // 4
-    'kwwwwwwwwwwwwwwk', // 5
-    'kwweewwwwwweewwk', // 6  目
-    'kwwehwwwwwwehwwk', // 7  目のハイライト
-    'kwwwwwwppwwwwwwk', // 8  鼻
-    'kwbwwwwkkwwwwbwk', // 9  口・ほっぺ
-    'kwbwwwwwwwwwwbwk', // 10
-    'kwwwwwwwwwwwwwwk', // 11
-    '.kwwwwwwwwwwwwk.', // 12
-    '.kwwwwwwwwwwwwk.', // 13
-    '..kwwwwwwwwwwk..', // 14
-    '...kkkkkkkkkk...', // 15  あご
-  ];
+  static const Map<Mood, List<String>> _grids = <Mood, List<String>>{
+    Mood.great: <String>[
+      '................................................................',
+      '................................................................',
+      '....................kkk..................kkk....................',
+      '....................kyk..................kYk....................',
+      '....................kykk.................kYk....................',
+      '...................kkyyk................kkYkk...................',
+      '...................kyyykk...............kYYYk...................',
+      '...................kyyyyk..............kkYYYkk..................',
+      '..................kkypyykk.............kyYpYYk..................',
+      '..................kyypyyyk.....kkk....kkyYpYYk..................',
+      '..................kyyppyykkkkkkkykkkkkkyyYpYYkk.................',
+      '.................kkypppyyykyyyyyyyyyyykyypppYYk.................',
+      '.................kyyppppyyyyyyyyyyyyyyyyypppYYkk................',
+      '................kkyyppppyyyyyyyyyyyyyyyypppppYYk................',
+      '................kyyppppppyyyyyyyyyyyyyyypppppYYkk...............',
+      '................kyypppppyyyyyyyyyyyyyyyyyppppYYYk...............',
+      '...............kkyyppppyYYYYYYYYYYYYYYYYYgppppggk...............',
+      '............q..kyyppppyyYYYYYYYYYYYYYYYYYggpppggkk..............',
+      '...........qqq.kyypppyyyYYYYYYYYYYYYYYYYYgggpppggk..............',
+      '............q.kkyypppyyyYYYYYYYYYYYYYYYYYgggpppggkk.q...........',
+      '..............kyypyyyyyyYYYYYYYYYYYYYYYYYggggggpggkqqq..........',
+      '.............kkyyyyyyyyyYYYYYYYYYYYYYYYYYgggggggggkkq...........',
+      '.............kyyyyyyyyyyYYYYYYYYsYYYYYYYYggggggggggk............',
+      '.............kyyyyyyyyyyYYYYYYYAAYYYYYYYYggggggggggk............',
+      '.............kyyyyyyyyyyYYYYYYYAAYYYYYYYYggggggggggk............',
+      '............kkyyyyyyyyyyYYYYYYYaaYYYYYYYYggggggggggkk...........',
+      '............kyyyyyyyyyyyYYYYYYYaaYYYYYYYYgggggggggggk...........',
+      '............kyyyyyyyyyyyYYYYYYYaaYYYYYYYYgggggggggggk...........',
+      '............kyyyyyyyyyyyYYYYYYYaaYYYYYYYYgggggggggggk...........',
+      '...........kkyyyyyyyyyyyYYYYYYYaaYYYYYYYYgggggggggggk...........',
+      '...........kYYYYYYYYYYYYgggggggggggggggggGGGGGGGGGGGk...........',
+      '...........kYYYYYYYYYYGGGGGGGgggggggGGGGGGGGGGGGGGGGk...........',
+      '...........kYYYYYYYYYYYYgggggggggggggggggGGGGGGGGGGGkk..........',
+      '...........kYYYYYYYYYYYYwwwaaaaaaaaAAAwwwGGGGGGGGGGGGk..........',
+      '...........kkYYYYYYYYYYkkkkkaaaaaaaAAkkkkkGGGGGGGGGGkk..........',
+      '............kYYYYYYYkkkwIIIwkkaaaakkkwIIIwkkGGGGGGGGk...........',
+      '............kYYYYYYYYYwIhiIIwakaaaAAwIhiIIwGkGGGGGGGk...........',
+      '............kYYYYYYYYwwIhiiIwwaaaAAwwIhiiIwwGGGGGGGGk...........',
+      '............kYYYYYYYYwwIieiIwwaAAAAwwIieiIwwGGGGGGGGk...........',
+      '..........q.kYYYYYYYYwwieeeiwwAAAAAwwieeeiwwGGGGGGGGk...........',
+      '.........qqqkgggggggggwIiehIwAAAAAAAwIiehIwGGGGGGGGGk...........',
+      '..........q.kkggggggggwIiiiIwAAAAAAAwIiiiIwGGGGGGGGkk...........',
+      '.............kgggggggggwIiIwAAAAAAAAAwIiIwGGGGGGGGGk............',
+      '.............kggggggggggwwwAAAAAAAAAAAwwwGGGGGGGGGGk...q........',
+      '.............kggggggggggbAAAAAAAAAAAAAAAbGGGGGGGGGkk..qqq.......',
+      '.............kggggggggggbbAAAAAAAAAAAAAbbGGGGGGGGGk....q........',
+      '.............kggggggggggbAAAAAAAAAAAAAAAbGGGGGGGGGk.............',
+      '.............kkggggggggggsAAAAAAsAAAAAAsgGGGGGGGGkkkkk..........',
+      '..............kgggggggggggssAAAAAAAAAssggGGGGGGGGkkkGkkk........',
+      '..............kgggggggggggggsssAAAsssggggGGGGGGGGkGGGGGk........',
+      '..............kgggggggggggggmgggsgggmggggGGGGGGGGkGGGGGkkk......',
+      '..............kgggggggggggggmmmgggmmmggggGGGGGGGGGGGGGGGGkkk....',
+      '..............kGGGGGGGGGGGGGGmmmmmmmGGGGGGGGGGGGGkGGGGGGGGGk....',
+      '..............kGGGGGGGkGGGGGGGGmmmGGGGGGGGGGGGGGGkGGGGGGGGGkk...',
+      '..............kkGGGGGGkkGGGGGGGGGGGGGGGGGkGGGGGGkkkkGGGGGGGGk...',
+      '...............kGGGGGGkkkkkGGGGGGGGGGGkkkkGGGGGGk..kkkGGGGGkkk..',
+      '...............kGGGGGGk...kkssAAAAAAkkk..kGGGGGGk....kGGGGGGGkk.',
+      '...............kGGGGGGk....kssAAAAAAk....kGGGGGGk....kkGGGGGGGk.',
+      '...............kGGGGGGk....kssAAAAAAk....kGGGGGGk....kkGGGGGGGkk',
+      '...............kGGGGGGk....kssAAAAAAk....kGGGGGGk....kGGGGGGGGGk',
+      '...............kkGGGGGk....kssAAAAAAk....kGGGGGkk....kkGGGGGGGkk',
+      '................kGGGGGkkkkkkssAAAAAAkkkkkkGGGGGk......kGGGGGGGk.',
+      '................kGDDddddddddssAAAAAAddddddddDDDkk....kkGGGGGGkk.',
+      '..............kkkDDDddddddddssAAAAAAddddddddDDDDkkk..kGGGGGGGk..',
+      '.............kkDDDDDdddddddddlllllldddddddddDDDDDDkkkkGGGGGGGkk.',
+      '............kkDDDDDDdddddddddlllllldddddddddDDDDDDDkkGGGGGGGGGk.',
+      '............kDDDDDDDdddddddddlllllldddddddddDDDDDDDDGGGGGGGGGkk.',
+      '...........kkDDDDDDDdddddddddlllllldddddddddDDDDDDDDGGGGGGGGGk..',
+      '...........kDDDDDDDDdddddddddlllllldddddddddDDDDDDDDDGGGGGGGkk..',
+      '..........kkDDDDDDDDdddddddddlllllldddddddddDDDDDDDDDGGGGGGkk...',
+      '..........kDDDDDDDDDdddddddddlllllldddddddddDDDDDDDDDDGGGGGGk...',
+      '..........kDDDDDDDDDdddddddddlllllldddddddddDDDDDDDDDDGGGGGkk...',
+      '..........kDDDDDDDDDdddddddddlllllldddddddddDDDDDDDDDDGGGGGk....',
+      '.........kkDDDDDDDDDdddddddddlllllldddddddddDDDDDDDDDDGGGGGk....',
+      '........kkDDDDDDDDDDdddddddddlllllldddddddddDDDDDDDDDDDGGGkk....',
+      '........kDDDDDDDDDDDDDDDDDDDDllllllDDDDDDDDDDDDDDDDDDDDDkkk.....',
+      '........kDDDDDDDDDDDDDDDDDDDDllllllDDDDDDDDDDDDDDDDDDDDDk.......',
+      '.......kkDDDDDDDDDDDDDDDDDDDDllllllDDDDDDDDDDDDDDDDDDDDDkk......',
+      '.......kDDDDDDDDDDDDDDDDDDDDDllllllDDDDDDDDDDDDDDDDDDDDDDk......',
+      '.......kkDDDDDDDDDDDDDDDDDDDDllllllDDDDDDDDDDDDDDDDDDDDDkk......',
+    ],
+    Mood.good: <String>[
+      '................................................................',
+      '................................................................',
+      '....................kkk..................kkk....................',
+      '....................kyk..................kYk....................',
+      '....................kykk.................kYk....................',
+      '...................kkyyk................kkYkk...................',
+      '...................kyyykk...............kYYYk...................',
+      '...................kyyyyk..............kkYYYkk..................',
+      '..................kkypyykk.............kyYpYYk..................',
+      '..................kyypyyyk.....kkk....kkyYpYYk..................',
+      '..................kyyppyykkkkkkkykkkkkkyyYpYYkk.................',
+      '.................kkypppyyykyyyyyyyyyyykyypppYYk.................',
+      '.................kyyppppyyyyyyyyyyyyyyyyypppYYkk................',
+      '................kkyyppppyyyyyyyyyyyyyyyypppppYYk................',
+      '................kyyppppppyyyyyyyyyyyyyyypppppYYkk...............',
+      '................kyypppppyyyyyyyyyyyyyyyyyppppYYYk...............',
+      '...............kkyyppppyYYYYYYYYYYYYYYYYYgppppggk...............',
+      '...............kyyppppyyYYYYYYYYYYYYYYYYYggpppggkk..............',
+      '...............kyypppyyyYYYYYYYYYYYYYYYYYgggpppggk..............',
+      '..............kkyypppyyyYYYYYYYYYYYYYYYYYgggpppggkk.............',
+      '..............kyypyyyyyyYYYYYYYYYYYYYYYYYggggggpggk.............',
+      '.............kkyyyyyyyyyYYYYYYYYYYYYYYYYYgggggggggkk............',
+      '.............kyyyyyyyyyyYYYYYYYYsYYYYYYYYggggggggggk............',
+      '.............kyyyyyyyyyyYYYYYYYAAYYYYYYYYggggggggggk............',
+      '.............kyyyyyyyyyyYYYYYYYAAYYYYYYYYggggggggggk............',
+      '............kkyyyyyyyyyyYYYYYYYaaYYYYYYYYggggggggggkk...........',
+      '............kyyyyyyyyyyyYYYYYYYaaYYYYYYYYgggggggggggk...........',
+      '............kyyyyyyyyyyyYYYYYYYaaYYYYYYYYgggggggggggk...........',
+      '............kyyyyyyyyyyyYYYYYYYaaYYYYYYYYgggggggggggk...........',
+      '...........kkyyyyyyyyyyyYYYYYYYaaYYYYYYYYgggggggggggk...........',
+      '...........kYYYYYYYYYYYYgggggggggggggggggGGGGGGGGGGGk...........',
+      '...........kYYYYYYYYYYGGGGGGGgggggggGGGGGGGGGGGGGGGGk...........',
+      '...........kYYYYYYYYYYYYgggggggggggggggggGGGGGGGGGGGkk..........',
+      '...........kYYYYYYYYYYYYwwwaaaaaaaaAAAwwwGGGGGGGGGGGGk..........',
+      '...........kkYYYYYYYYYYkkkkkaaaaaaaAAkkkkkGGGGGGGGGGkk..........',
+      '............kYYYYYYYkkkwIIIwkkaaaakkkwIIIwkkGGGGGGGGk...........',
+      '............kYYYYYYYYYwIhiIIwakaaaAAwIhiIIwGkGGGGGGGk...........',
+      '............kYYYYYYYYwwIhiiIwwaaaAAwwIhiiIwwGGGGGGGGk...........',
+      '............kYYYYYYYYwwIieiIwwaAAAAwwIieiIwwGGGGGGGGk...........',
+      '............kYYYYYYYYwwieeeiwwAAAAAwwieeeiwwGGGGGGGGk...........',
+      '............kgggggggggwIieiIwAAAAAAAwIieiIwGGGGGGGGGk...........',
+      '............kkggggggggwIiiiIwAAAAAAAwIiiiIwGGGGGGGGkk...........',
+      '.............kgggggggggwIiIwAAAAAAAAAwIiIwGGGGGGGGGk............',
+      '.............kggggggggggwwwAAAAAAAAAAAwwwGGGGGGGGGGk............',
+      '.............kggggggggggbAAAAAAAAAAAAAAAbGGGGGGGGGkk............',
+      '.............kggggggggggbbAAAAAAAAAAAAAbbGGGGGGGGGk.............',
+      '.............kggggggggggbAAAAAAAAAAAAAAAbGGGGGGGGGk.............',
+      '.............kkggggggggggsAAAAAAsAAAAAAsgGGGGGGGGkkkkk..........',
+      '..............kgggggggggggssAAAAAAAAAssggGGGGGGGGkkkGkkk........',
+      '..............kgggggggggggggsssAAAsssggggGGGGGGGGkGGGGGk........',
+      '..............kgggggggggggggggggsggggggggGGGGGGGGkGGGGGkkk......',
+      '..............kggggggggggggggmmgggmmgggggGGGGGGGGGGGGGGGGkkk....',
+      '..............kGGGGGGGGGGGGGGGGmmmGGGGGGGGGGGGGGGkGGGGGGGGGk....',
+      '..............kGGGGGGGkGGGGGGGGGGGGGGGGGGGGGGGGGGkGGGGGGGGGkk...',
+      '..............kkGGGGGGkkGGGGGGGGGGGGGGGGGkGGGGGGkkkkGGGGGGGGk...',
+      '...............kGGGGGGkkkkkGGGGGGGGGGGkkkkGGGGGGk..kkkGGGGGkkk..',
+      '...............kGGGGGGk...kkssAAAAAAkkk..kGGGGGGk....kGGGGGGGkk.',
+      '...............kGGGGGGk....kssAAAAAAk....kGGGGGGk....kkGGGGGGGk.',
+      '...............kGGGGGGk....kssAAAAAAk....kGGGGGGk....kkGGGGGGGkk',
+      '...............kGGGGGGk....kssAAAAAAk....kGGGGGGk....kGGGGGGGGGk',
+      '...............kkGGGGGk....kssAAAAAAk....kGGGGGkk....kkGGGGGGGkk',
+      '................kGGGGGkkkkkkssAAAAAAkkkkkkGGGGGk......kGGGGGGGk.',
+      '................kGDDddddddddssAAAAAAddddddddDDDkk....kkGGGGGGkk.',
+      '..............kkkDDDddddddddssAAAAAAddddddddDDDDkkk..kGGGGGGGk..',
+      '.............kkDDDDDdddddddddlllllldddddddddDDDDDDkkkkGGGGGGGkk.',
+      '............kkDDDDDDdddddddddlllllldddddddddDDDDDDDkkGGGGGGGGGk.',
+      '............kDDDDDDDdddddddddlllllldddddddddDDDDDDDDGGGGGGGGGkk.',
+      '...........kkDDDDDDDdddddddddlllllldddddddddDDDDDDDDGGGGGGGGGk..',
+      '...........kDDDDDDDDdddddddddlllllldddddddddDDDDDDDDDGGGGGGGkk..',
+      '..........kkDDDDDDDDdddddddddlllllldddddddddDDDDDDDDDGGGGGGkk...',
+      '..........kDDDDDDDDDdddddddddlllllldddddddddDDDDDDDDDDGGGGGGk...',
+      '..........kDDDDDDDDDdddddddddlllllldddddddddDDDDDDDDDDGGGGGkk...',
+      '..........kDDDDDDDDDdddddddddlllllldddddddddDDDDDDDDDDGGGGGk....',
+      '.........kkDDDDDDDDDdddddddddlllllldddddddddDDDDDDDDDDGGGGGk....',
+      '........kkDDDDDDDDDDdddddddddlllllldddddddddDDDDDDDDDDDGGGkk....',
+      '........kDDDDDDDDDDDDDDDDDDDDllllllDDDDDDDDDDDDDDDDDDDDDkkk.....',
+      '........kDDDDDDDDDDDDDDDDDDDDllllllDDDDDDDDDDDDDDDDDDDDDk.......',
+      '.......kkDDDDDDDDDDDDDDDDDDDDllllllDDDDDDDDDDDDDDDDDDDDDkk......',
+      '.......kDDDDDDDDDDDDDDDDDDDDDllllllDDDDDDDDDDDDDDDDDDDDDDk......',
+      '.......kkDDDDDDDDDDDDDDDDDDDDllllllDDDDDDDDDDDDDDDDDDDDDkk......',
+    ],
+    Mood.worried: <String>[
+      '................................................................',
+      '................................................................',
+      '....................kkk..................kkk....................',
+      '....................kyk..................kYk....................',
+      '....................kykk.................kYk....................',
+      '...................kkyyk................kkYkk...................',
+      '...................kyyykk...............kYYYk...................',
+      '...................kyyyyk..............kkYYYkk..................',
+      '..................kkypyykk.............kyYpYYk..................',
+      '..................kyypyyyk.....kkk....kkyYpYYk..................',
+      '..................kyyppyykkkkkkkykkkkkkyyYpYYkk.................',
+      '.................kkypppyyykyyyyyyyyyyykyypppYYk.................',
+      '.................kyyppppyyyyyyyyyyyyyyyyypppYYkk................',
+      '................kkyyppppyyyyyyyyyyyyyyyypppppYYk................',
+      '................kyyppppppyyyyyyyyyyyyyyypppppYYkk...............',
+      '................kyypppppyyyyyyyyyyyyyyyyyppppYYYk...............',
+      '...............kkyyppppyYYYYYYYYYYYYYYYYYgppppggk...............',
+      '...............kyyppppyyYYYYYYYYYYYYYYYYYggpppggkk..............',
+      '...............kyypppyyyYYYYYYYYYYYYYYYYYgggpppggk..............',
+      '..............kkyypppyyyYYYYYYYYYYYYYYYYYgggpppggkk.............',
+      '..............kyypyyyyyyYYYYYYYYYYYYYYYYYggggggpggk.............',
+      '.............kkyyyyyyyyyYYYYYYYYYYYYYYYYYgggggggggkk............',
+      '.............kyyyyyyyyyyYYYYYYYYsYYYYYYYYggggggggggk............',
+      '.............kyyyyyyyyyyYYYYYYYAAYYYYYYYYggggggggggk............',
+      '.............kyyyyyyyyyyYYYYYYYAAYYYYYYYYggggggggggk............',
+      '............kkyyyyyyyyyyYYYYYYYaaYYYYYYYYggggggggggkk...........',
+      '............kyyyyyyyyyyyYYYYYYYaaYYYYYYYYgggggggggggk...........',
+      '............kyyyyyyyyyyyYYYYYYYaaYYYYYYYYgggggggggggk...........',
+      '............kyyyyyyyyyyyYYYYYYYaaYYYYYYYYgggggggggggk...........',
+      '...........kkyyyyyyyyyyyYYYYYYYaaYYYYYYYYgggggggggggk...........',
+      '...........kYYYYYYYYYYYYgggggggggggggggggGGGGGtGGGGGk...........',
+      '...........kYYYYYYYYYYGGGgggggggggggGGGggGGGGGGtGGGGk...........',
+      '...........kYYYYYYYYYYYYgGGGgggggggggggGGGGGGGGGtGGGkk..........',
+      '...........kYYYYYYYYYYYYwwwaGaaaaaaAAAwwwGGGGGGGGGGGGk..........',
+      '...........kkYYYYYYYYYYkkkkkaaaaaaaAAkkkkkGGGGGGGGGGkk..........',
+      '............kYYYYYYYkkkwIIIwkkaaaakkkwIIIwkkGGGGGGGGk...........',
+      '............kYYYYYYYYYwIhiIIwakaaaAAwIhiIIwGkGGGGGGGk...........',
+      '............kYYYYYYYYwwIhiiIwwaaaAAwwIhiiIwwGGGGGGGGk...........',
+      '............kYYYYYYYYwwIieiIwwaAAAAwwIieiIwwGGGGGGGGk...........',
+      '............kYYYYYYYYwwieeeiwwAAAAAwwieeeiwwGGGGGGGGk...........',
+      '............kgggggggggwIieiIwAAAAAAAwIieiIwGGGGGGGGGk...........',
+      '............kkggggggggwIiiiIwAAAAAAAwIiiiIwGGGGGGGGkk...........',
+      '.............kgggggggggwIiIwAAAAAAAAAwIiIwGGGGGGGGGk............',
+      '.............kggggggggggwwwAAAAAAAAAAAwwwGGGGGGGGGGk............',
+      '.............kggggggggggbAAAAAAAAAAAAAAAbGGGGGGGGGkk............',
+      '.............kggggggggggbbAAAAAAAAAAAAAbbGGGGGGGGGk.............',
+      '.............kggggggggggbAAAAAAAAAAAAAAAbGGGGGGGGGk.............',
+      '.............kkggggggggggsAAAAAAsAAAAAAsgGGGGGGGGkkkkk..........',
+      '..............kgggggggggggssAAAAAAAAAssggGGGGGGGGkkkGkkk........',
+      '..............kgggggggggggggsssAAAsssggggGGGGGGGGkGGGGGk........',
+      '..............kgggggggggggggggggsggggggggGGGGGGGGkGGGGGkkk......',
+      '..............kggggggggggggggggggggggggggGGGGGGGGGGGGGGGGkkk....',
+      '..............kGGGGGGGGGGGGGGGmmmmmGGGGGGGGGGGGGGkGGGGGGGGGk....',
+      '..............kGGGGGGGkGGGGGGGGGGGGGGGGGGGGGGGGGGkGGGGGGGGGkk...',
+      '..............kkGGGGGGkkGGGGGGGGGGGGGGGGGkGGGGGGkkkkGGGGGGGGk...',
+      '...............kGGGGGGkkkkkGGGGGGGGGGGkkkkGGGGGGk..kkkGGGGGkkk..',
+      '...............kGGGGGGk...kkssAAAAAAkkk..kGGGGGGk....kGGGGGGGkk.',
+      '...............kGGGGGGk....kssAAAAAAk....kGGGGGGk....kkGGGGGGGk.',
+      '...............kGGGGGGk....kssAAAAAAk....kGGGGGGk....kkGGGGGGGkk',
+      '...............kGGGGGGk....kssAAAAAAk....kGGGGGGk....kGGGGGGGGGk',
+      '...............kkGGGGGk....kssAAAAAAk....kGGGGGkk....kkGGGGGGGkk',
+      '................kGGGGGkkkkkkssAAAAAAkkkkkkGGGGGk......kGGGGGGGk.',
+      '................kGDDddddddddssAAAAAAddddddddDDDkk....kkGGGGGGkk.',
+      '..............kkkDDDddddddddssAAAAAAddddddddDDDDkkk..kGGGGGGGk..',
+      '.............kkDDDDDdddddddddlllllldddddddddDDDDDDkkkkGGGGGGGkk.',
+      '............kkDDDDDDdddddddddlllllldddddddddDDDDDDDkkGGGGGGGGGk.',
+      '............kDDDDDDDdddddddddlllllldddddddddDDDDDDDDGGGGGGGGGkk.',
+      '...........kkDDDDDDDdddddddddlllllldddddddddDDDDDDDDGGGGGGGGGk..',
+      '...........kDDDDDDDDdddddddddlllllldddddddddDDDDDDDDDGGGGGGGkk..',
+      '..........kkDDDDDDDDdddddddddlllllldddddddddDDDDDDDDDGGGGGGkk...',
+      '..........kDDDDDDDDDdddddddddlllllldddddddddDDDDDDDDDDGGGGGGk...',
+      '..........kDDDDDDDDDdddddddddlllllldddddddddDDDDDDDDDDGGGGGkk...',
+      '..........kDDDDDDDDDdddddddddlllllldddddddddDDDDDDDDDDGGGGGk....',
+      '.........kkDDDDDDDDDdddddddddlllllldddddddddDDDDDDDDDDGGGGGk....',
+      '........kkDDDDDDDDDDdddddddddlllllldddddddddDDDDDDDDDDDGGGkk....',
+      '........kDDDDDDDDDDDDDDDDDDDDllllllDDDDDDDDDDDDDDDDDDDDDkkk.....',
+      '........kDDDDDDDDDDDDDDDDDDDDllllllDDDDDDDDDDDDDDDDDDDDDk.......',
+      '.......kkDDDDDDDDDDDDDDDDDDDDllllllDDDDDDDDDDDDDDDDDDDDDkk......',
+      '.......kDDDDDDDDDDDDDDDDDDDDDllllllDDDDDDDDDDDDDDDDDDDDDDk......',
+      '.......kkDDDDDDDDDDDDDDDDDDDDllllllDDDDDDDDDDDDDDDDDDDDDkk......',
+    ],
+    Mood.bad: <String>[
+      '................................................................',
+      '................................................................',
+      '....................kkk..................kkk....................',
+      '....................kyk..................kYk....................',
+      '....................kykk.................kYk....................',
+      '...................kkyyk................kkYkk...................',
+      '...................kyyykk...............kYYYk...................',
+      '...................kyyyyk..............kkYYYkk..................',
+      '..................kkypyykk.............kyYpYYk..................',
+      '..................kyypyyyk.....kkk....kkyYpYYk..................',
+      '..................kyyppyykkkkkkkykkkkkkyyYpYYkk.................',
+      '.................kkypppyyykyyyyyyyyyyykyypppYYk.................',
+      '.................kyyppppyyyyyyyyyyyyyyyyypppYYkk................',
+      '................kkyyppppyyyyyyyyyyyyyyyypppppYYk................',
+      '................kyyppppppyyyyyyyyyyyyyyypppppYYkk...............',
+      '................kyypppppyyyyyyyyyyyyyyyyyppppYYYk...............',
+      '...............kkyyppppyYYYYYYYYYYYYYYYYYgppppggk...............',
+      '...............kyyppppyyYYYYYYYYYYYYYYYYYggpppggkk..............',
+      '...............kyypppyyyYYYYYYYYYYYYYYYYYgggpppggk..............',
+      '..............kkyypppyyyYYYYYYYYYYYYYYYYYgggpppggkk.............',
+      '..............kyypyyyyyyYYYYYYYYYYYYYYYYYggggggpggk.............',
+      '.............kkyyyyyyyyyYYYYYYYYYYYYYYYYYgggggggggkk............',
+      '.............kyyyyyyyyyyYYYYYYYYsYYYYYYYYggggggggggk............',
+      '.............kyyyyyyyyyyYYYYYYYAAYYYYYYYYggggggggggk............',
+      '.............kyyyyyyyyyyYYYYYYYAAYYYYYYYYggggggggggk............',
+      '............kkyyyyyyyyyyYYYYYYYaaYYYYYYYYggggggggggkk...........',
+      '............kyyyyyyyyyyyYYYYYYYaaYYYYYYYYgggggggggggk...........',
+      '............kyyyyyyyyyyyYYYYYYYaaYYYYYYYYgggggggggggk...........',
+      '............kyyyyyyyyyyyYYYYYYYaaYYYYYYYYggoogggggggk...........',
+      '...........kkyyyyyyyyyyyYYYYYYYaaYYYYYYYYgggggggggggk...........',
+      '...........kYYYYYYYYYYYYgggggggggggggggggGGGGGGGGGGGk...........',
+      '...........kYYYYYYYYYYGGGgggggggggggGGGggGGGGGGGGGGGk...........',
+      '...........kYYYYYYYYYYYYgGGGgggggggggggGGooGGGGGGGGGkk..........',
+      '...........kYYYYYYYYYYYYAAAaGaaaaaaAAAAAAGGGGGGGGGGGGk..........',
+      '...........kkYYYYYYYYYYAAAAAaaaaaaaAAAAAAAGGGGGGGGGGkk..........',
+      '............kYYYYYYYYYAAAAAAAaaaaaaAAAAAAAAGGGGGGGGGk...........',
+      '............kYYYYYYYYAAAAAAAAAaaaaAAAAAAAAAooGGGGGGGk...........',
+      '............kYYYYYYYYkkkkkkkkkaaaAAkkkkkkkkkGGGGGGGGk...........',
+      '............kYYYYYYYYwwIhiiIwwaAAAAwwIhiiIwwGGGGGGGGk...........',
+      '............kYYYYYYYYwIiieiiIwAAAAAwIiieiiIwGGGGGGGGk...........',
+      '............kgggggggggwiieiiwAAAAAAAwiieiooGGGGGGGGGk...........',
+      '............kkggggggggwIiiiIwAAAAAAAwIiiiIwGGGGGGGGkk...........',
+      '.............kgggggggggwItIwAAAAAAAAAwItIwGGGGGGGGGk............',
+      '.............kggggggggbsstsssAAAAAAAssstssbGGGGGGGGk............',
+      '.............kggggggggggbtAAAAAAAAAAAAAtbGGooGGGGGkk............',
+      '.............kggggggggggbtAAAAAAAAAAAAAtbGGGGGGGGGk.............',
+      '.............kggggggggggbtAAAAAAAAAAAAAtbGGGGGGGGGk.............',
+      '.............kkggggggggggtAAAAAAsAAAAAAtgGGGGGGGGkkkkk..........',
+      '..............kgggggggggggssAAAAAAAAAssggGooGGGGGkkkGkkk........',
+      '..............kgggggggggggggsssAAAsssggggGGGGGGGGkGGGGGk........',
+      '..............kgggggggggggggggggsggggggggGGGGGGGGkGGGGGkkk......',
+      '..............kgggggggggggggggggggccccccccrGGGGGGGGGGGGGGkkk....',
+      '..............kGGGGGGGGGGGGGGGGmmmccccccccrGGGGGGkGGGGGGGGGk....',
+      '..............kGGGGGGGkGGGGGGmmGGGmmGGGGGGGGGGGGGkGGGGGGGGGkk...',
+      '..............kkGGGGGGkkGGGGGGGGGGGGGGGGGkGGGGGGkkkkGGGGGGGGk...',
+      '...............kGGGGGGkkkkkGGGGGGGGGGGkkkkGGGGGGk..kkkGGGGGkkk..',
+      '...............kGGGGGGk...kkssAAAAAAkkk..kGGGGGGk....kGGGGGGGkk.',
+      '...............kGGGGGGk....kssAAAAAAk....kGGGGGGk....kkGGGGGGGk.',
+      '...............kGGGGGGk....kssAAAAAAk....kGGGGGGk....kkGGGGGGGkk',
+      '...............kGGGGGGk....kssAAAAAAk....kGGGGGGk....kGGGGGGGGGk',
+      '...............kkGGGGGk....kssAAAAAAk....kGGGGGkk....kkGGGGGGGkk',
+      '................kGGGGGkkkkkkssAAAAAAkkkkkkGGGGGk......kGGGGGGGk.',
+      '................kGDDddddddddssAAAAAAddddddddDDDkk....kkGGGGGGkk.',
+      '..............kkkDDDddddddddssAAAAAAddddddddDDDDkkk..kGGGGGGGk..',
+      '.............kkDDDDDdddddddddlllllldddddddddDDDDDDkkkkGGGGGGGkk.',
+      '............kkDDDDDDdddddddddlllllldddddddddDDDDDDDkkGGGGGGGGGk.',
+      '............kDDDDDDDdddddddddlllllldddddddddDDDDDDDDGGGGGGGGGkk.',
+      '...........kkDDDDDDDdddddddddlllllldddddddddDDDDDDDDGGGGGGGGGk..',
+      '...........kDDDDDDDDdddddddddlllllldddddddddDDDDDDDDDGGGGGGGkk..',
+      '..........kkDDDDDDDDdddddddddlllllldddddddddDDDDDDDDDGGGGGGkk...',
+      '..........kDDDDDDDDDdddddddddlllllldddddddddDDDDDDDDDDGGGGGGk...',
+      '..........kDDDDDDDDDdddddddddlllllldddddddddDDDDDDDDDDGGGGGkk...',
+      '..........kDDDDDDDDDdddddddddlllllldddddddddDDDDDDDDDDGGGGGk....',
+      '.........kkDDDDDDDDDdddddddddlllllldddddddddDDDDDDDDDDGGGGGk....',
+      '........kkDDDDDDDDDDdddddddddlllllldddddddddDDDDDDDDDDDGGGkk....',
+      '........kDDDDDDDDDDDDDDDDDDDDllllllDDDDDDDDDDDDDDDDDDDDDkkk.....',
+      '........kDDDDDDDDDDDDDDDDDDDDllllllDDDDDDDDDDDDDDDDDDDDDk.......',
+      '.......kkDDDDDDDDDDDDDDDDDDDDllllllDDDDDDDDDDDDDDDDDDDDDkk......',
+      '.......kDDDDDDDDDDDDDDDDDDDDDllllllDDDDDDDDDDDDDDDDDDDDDDk......',
+      '.......kkDDDDDDDDDDDDDDDDDDDDllllllDDDDDDDDDDDDDDDDDDDDDkk......',
+    ],
+  };
 
-  /// 気分ごとに、目・口などの行だけを差し替えて表情を作る。
-  static List<String> forMood(Mood mood) {
-    final List<String> g = List<String>.from(_base);
-    switch (mood) {
-      case Mood.great: // ゼロ本！ 満面の笑み＋きらきら
-        g[1] = '..kwkg....gkwk..';
-        g[6] = 'kwwwkwwwwwwkwwwk';
-        g[7] = 'kwwkwkwwwwkwkwwk';
-        g[9] = 'kwwwwwkwwkwwwwwk';
-        g[10] = 'kwwwwwkkkkwwwwwk';
-        break;
-      case Mood.good: // 減らせてる にっこり
-        g[9] = 'kwbwwwkwwkwwwbwk';
-        g[10] = 'kwbwwwwkkwwwwbwk';
-        break;
-      case Mood.worried: // ちょっと多い 汗＋への字口
-        g[4] = 'kwwwwwwwwwwwtwwk';
-        g[6] = 'kwweewwwwwweewwk';
-        g[7] = 'kwweewwwwwweewwk';
-        g[9] = 'kwwwwwwkkwwwwwwk';
-        break;
-      case Mood.bad: // 吸いすぎ なみだ＋タバコ＋けむり
-        g[3] = '.kwwwwwmwwwwwwk.';
-        g[5] = 'kwwwwwwwmwwwwwwk';
-        g[6] = 'kwweewwwwwweewwk';
-        g[7] = 'kwwttwwwwwwttwwk';
-        g[9] = 'kwwwwwkyykwwwwwk';
-        g[10] = 'kwbwwkwwwwkwwbwk';
-        break;
-    }
-    return g;
-  }
+  static List<String> forMood(Mood mood) => _grids[mood]!;
 
-  /// 気分に応じたヤメにゃんのセリフ。
   static String message(Mood mood) {
     switch (mood) {
       case Mood.great:
-        return '今日はまだゼロ本！さいこうにゃ🌱';
+        return '今日はまだゼロ本！さいこうにゃ〜！';
       case Mood.good:
         return 'へらせてるね、えらいにゃ〜！';
       case Mood.worried:
@@ -81,7 +355,6 @@ class CatArt {
     }
   }
 
-  /// 状態ラベル（バッジ表示用）。
   static String statusLabel(Mood mood) {
     switch (mood) {
       case Mood.great:
