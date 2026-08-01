@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../models/cat_pixels.dart';
+import '../models/cat.dart';
 import '../models/quit_data.dart';
-import '../widgets/pixel_cat.dart';
+import '../widgets/character_view.dart';
 import '../widgets/speech_bubble.dart';
 import '../widgets/stat_tile.dart';
 import 'achievements_screen.dart';
@@ -168,7 +168,7 @@ class _HomeScreenState extends State<HomeScreen>
                     child: child,
                   );
                 },
-                child: Center(child: PixelCat(mood: mood, size: 200)),
+                child: Center(child: CharacterView(mood: mood, height: 220)),
               ),
               const SizedBox(height: 8),
 

@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'cat_pixels.dart';
+import 'cat.dart';
 
 /// アプリの状態を保持し、端末に永続化するモデル。
 ///

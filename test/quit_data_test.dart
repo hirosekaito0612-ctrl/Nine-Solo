@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nine_solo/models/achievements.dart';
-import 'package:nine_solo/models/cat_pixels.dart';
+import 'package:nine_solo/models/cat.dart';
 import 'package:nine_solo/models/quit_data.dart';
 
 QuitData _sample() => QuitData(
@@ -15,16 +15,6 @@ QuitData _sample() => QuitData(
 
 void main() {
   group('CatArt', () {
-    test('全ての気分でドット絵は16x16である', () {
-      for (final Mood m in Mood.values) {
-        final List<String> g = CatArt.forMood(m);
-        expect(g.length, 16, reason: '$m の行数');
-        for (final String row in g) {
-          expect(row.length, 16, reason: '$m の行 "$row"');
-        }
-      }
-    });
-
     test('全ての気分でセリフとラベルが空でない', () {
       for (final Mood m in Mood.values) {
         expect(CatArt.message(m).isNotEmpty, isTrue);

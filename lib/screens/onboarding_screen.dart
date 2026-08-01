@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../models/cat_pixels.dart';
+import '../models/cat.dart';
 import '../models/quit_data.dart';
-import '../widgets/pixel_cat.dart';
+import '../widgets/character_view.dart';
 
 /// 初回起動時に「1日の平均本数」と「1箱の値段」を聞く画面。
 class OnboardingScreen extends StatefulWidget {
@@ -50,7 +50,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               const SizedBox(height: 12),
-              const Center(child: PixelCat(mood: Mood.good, size: 160)),
+              const Center(child: CharacterView(mood: Mood.good, height: 170)),
               const SizedBox(height: 16),
               Text(
                 'はじめまして、ヤメにゃんだにゃ',

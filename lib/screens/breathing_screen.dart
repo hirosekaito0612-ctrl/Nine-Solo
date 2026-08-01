@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../models/cat_pixels.dart';
-import '../widgets/pixel_cat.dart';
+import '../models/cat.dart';
+import '../widgets/character_view.dart';
 
 /// 吸いたくなったときの深呼吸モード。
 ///
@@ -87,7 +87,7 @@ class _BreathingScreenState extends State<BreathingScreen>
                   final double scale = 1.0 + 0.12 * _breath.value;
                   return Transform.scale(scale: scale, child: child);
                 },
-                child: const PixelCat(mood: Mood.calm, size: 200),
+                child: const CharacterView(mood: Mood.calm, height: 200),
               ),
               const SizedBox(height: 24),
 
