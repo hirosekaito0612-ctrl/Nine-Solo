@@ -8,7 +8,10 @@ import '../widgets/character_view.dart';
 /// ヤメにゃんと一緒に「4秒すって4秒はく」を繰り返す。
 /// 「がまんできた！」で閉じると true を返し、呼び出し側が記録する。
 class BreathingScreen extends StatefulWidget {
-  const BreathingScreen({super.key});
+  const BreathingScreen({super.key, this.outfit = 0, this.ambiance = 0});
+
+  final int outfit;
+  final int ambiance;
 
   @override
   State<BreathingScreen> createState() => _BreathingScreenState();
@@ -87,7 +90,12 @@ class _BreathingScreenState extends State<BreathingScreen>
                   final double scale = 1.0 + 0.12 * _breath.value;
                   return Transform.scale(scale: scale, child: child);
                 },
-                child: const CharacterView(mood: Mood.calm, height: 200),
+                child: CharacterView(
+                  mood: Mood.calm,
+                  height: 220,
+                  outfit: widget.outfit,
+                  ambiance: widget.ambiance,
+                ),
               ),
               const SizedBox(height: 24),
 

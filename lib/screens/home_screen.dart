@@ -72,7 +72,9 @@ class _HomeScreenState extends State<HomeScreen>
     final bool? resisted = await Navigator.push<bool>(
       context,
       MaterialPageRoute<bool>(
-          builder: (BuildContext _) => const BreathingScreen()),
+        builder: (BuildContext _) =>
+            BreathingScreen(outfit: data.outfit, ambiance: data.ambiance),
+      ),
     );
     if (resisted == true) {
       await data.addResisted();
@@ -168,7 +170,14 @@ class _HomeScreenState extends State<HomeScreen>
                     child: child,
                   );
                 },
-                child: Center(child: CharacterView(mood: mood, height: 220)),
+                child: Center(
+                  child: CharacterView(
+                    mood: mood,
+                    height: 260,
+                    outfit: data.outfit,
+                    ambiance: data.ambiance,
+                  ),
+                ),
               ),
               const SizedBox(height: 8),
 
@@ -335,69 +344,115 @@ class _HomeScreenState extends State<HomeScreen>
         TextEditingController(text: '${data.baseline}');
     final TextEditingController priceCtrl =
         TextEditingController(text: '${data.pricePerPack.round()}');
+    int outfit = data.outfit;
+    int ambiance = data.ambiance;
 
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
       builder: (BuildContext ctx) {
-        return Padding(
-          padding: EdgeInsets.only(
-            left: 20,
-            right: 20,
-            top: 8,
-            bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              Text('設定',
-                  style: Theme.of(ctx)
-                      .textTheme
-                      .titleLarge
-                      ?.copyWith(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 16),
-              TextField(
-                controller: baselineCtrl,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: '1日の平均本数（目安）',
-                  border: OutlineInputBorder(),
-                  suffixText: '本',
-                ),
+        return StatefulBuilder(
+          builder: (BuildContext ctx, StateSetter setSheetState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 20,
+                right: 20,
+                top: 8,
+                bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
               ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: priceCtrl,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: '1箱の値段',
-                  border: OutlineInputBorder(),
-                  prefixText: '¥ ',
-                ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  Text('設定',
+                      style: Theme.of(ctx)
+                          .textTheme
+                          .titleLarge
+                          ?.copyWith(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: baselineCtrl,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: '1日の平均本数（目安）',
+                      border: OutlineInputBorder(),
+                      suffixText: '本',
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: priceCtrl,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: '1箱の値段',
+                      border: OutlineInputBorder(),
+                      prefixText: '¥ ',
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text('きせかえ（シャツ）',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(ctx).colorScheme.onSurfaceVariant)),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    children:
+                        List<Widget>.generate(CharacterView.outfitLabels.length,
+                            (int i) {
+                      return ChoiceChip(
+                        label: Text(CharacterView.outfitLabels[i]),
+                        selected: outfit == i,
+                        onSelected: (bool _) =>
+                            setSheetState(() => outfit = i),
+                      );
+                    }),
+                  ),
+                  const SizedBox(height: 12),
+                  Text('ふんいき（あかり）',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(ctx).colorScheme.onSurfaceVariant)),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    children: List<Widget>.generate(
+                        CharacterView.ambianceLabels.length, (int i) {
+                      return ChoiceChip(
+                        label: Text(CharacterView.ambianceLabels[i]),
+                        selected: ambiance == i,
+                        onSelected: (bool _) =>
+                            setSheetState(() => ambiance = i),
+                      );
+                    }),
+                  ),
+                  const SizedBox(height: 20),
+                  FilledButton(
+                    onPressed: () async {
+                      data.baseline = int.tryParse(baselineCtrl.text.trim()) ??
+                          data.baseline;
+                      data.pricePerPack =
+                          double.tryParse(priceCtrl.text.trim()) ??
+                              data.pricePerPack;
+                      data.outfit = outfit;
+                      data.ambiance = ambiance;
+                      await data.save();
+                      if (ctx.mounted) Navigator.pop(ctx);
+                      if (mounted) setState(() {});
+                    },
+                    child: const Text('保存する'),
+                  ),
+                  const SizedBox(height: 8),
+                  TextButton(
+                    onPressed: () => _confirmReset(ctx),
+                    child: const Text('データをリセット',
+                        style: TextStyle(color: Colors.redAccent)),
+                  ),
+                ],
               ),
-              const SizedBox(height: 20),
-              FilledButton(
-                onPressed: () async {
-                  data.baseline =
-                      int.tryParse(baselineCtrl.text.trim()) ?? data.baseline;
-                  data.pricePerPack = double.tryParse(priceCtrl.text.trim()) ??
-                      data.pricePerPack;
-                  await data.save();
-                  if (ctx.mounted) Navigator.pop(ctx);
-                  if (mounted) setState(() {});
-                },
-                child: const Text('保存する'),
-              ),
-              const SizedBox(height: 8),
-              TextButton(
-                onPressed: () => _confirmReset(ctx),
-                child: const Text('データをリセット',
-                    style: TextStyle(color: Colors.redAccent)),
-              ),
-            ],
-          ),
+            );
+          },
         );
       },
     );

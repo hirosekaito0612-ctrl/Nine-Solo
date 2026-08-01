@@ -16,6 +16,8 @@ class QuitData {
   String startDate; // 記録開始日 yyyy-MM-dd
   Map<String, int> counts; // 日付 -> 本数
   Map<String, int> resisted; // 日付 -> 我慢できた回数
+  int outfit; // きせかえ 0=グレー 1=レッド 2=オリーブ
+  int ambiance; // ふんいき 0=よる 1=ゆうぐれ 2=しんや
 
   QuitData({
     required this.onboarded,
@@ -25,6 +27,8 @@ class QuitData {
     required this.startDate,
     required this.counts,
     required this.resisted,
+    this.outfit = 0,
+    this.ambiance = 0,
   });
 
   // ---- 日付ヘルパー -------------------------------------------------------
@@ -159,6 +163,8 @@ class QuitData {
       startDate: p.getString('start_date') ?? today(),
       counts: _decode(p.getString('counts')),
       resisted: _decode(p.getString('resisted')),
+      outfit: p.getInt('outfit') ?? 0,
+      ambiance: p.getInt('ambiance') ?? 0,
     );
   }
 
@@ -171,6 +177,8 @@ class QuitData {
     await p.setString('start_date', startDate);
     await p.setString('counts', jsonEncode(counts));
     await p.setString('resisted', jsonEncode(resisted));
+    await p.setInt('outfit', outfit);
+    await p.setInt('ambiance', ambiance);
   }
 
   Future<void> resetAll() async {
@@ -183,6 +191,8 @@ class QuitData {
     startDate = today();
     counts = <String, int>{};
     resisted = <String, int>{};
+    outfit = 0;
+    ambiance = 0;
   }
 
   static Map<String, int> _decode(String? s) {

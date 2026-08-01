@@ -50,7 +50,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               const SizedBox(height: 12),
-              const Center(child: CharacterView(mood: Mood.good, height: 170)),
+              const Center(child: CharacterView(mood: Mood.good, height: 200)),
               const SizedBox(height: 16),
               Text(
                 'はじめまして、ヤメにゃんだにゃ',
